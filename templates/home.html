@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Request Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+        }
+
+        .dashboard {
+            max-width: 1500px;
+            margin: auto;
+            padding: 10px;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropbtn {
+            background-color: #333;
+            color: white;
+            padding: 7px;
+            font-size: 12px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0px 8px 12px 0px rgba(0,0,0,0.2);
+            font-size: 12px;
+            z-index: 1;
+        }
+
+        .dropdown-content input {
+            color: black;
+            padding: 5px 6px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content input:hover {background-color: #f1f1f1}
+
+        .dropdown-content label {
+            display: flex;
+            align-items: center;
+            padding: 4px 6px;
+            cursor: pointer;
+        }
+
+        .dropdown-content input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown:hover .dropbtn {
+            background-color: white;
+            color: #333;
+            border: 2px solid #333;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .tooltip {
+        position: relative;
+        display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 140px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -75px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        }
+
+        .tooltip .tooltiptext::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #555 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: 12px;
+        }
+
+        #btn {
+            background-color: #333;
+            border: none;
+            padding: 7px;
+            color: #fff;
+            margin: 20px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        #btn:hover {
+            background-color: #fff;
+            color: #333;
+            border: solid #333;
+            border-radius: 5px;
+        }
+
+        #ovrly {
+            background-color: #333;
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            opacity: 0.5;
+        }
+
+        #api-rqts {
+            background-color: #fff;
+            width: 40%;
+            margin: auto;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: top;
+            position: sticky;
+        }
+
+        #ovrly, #api-rqts {
+            display: none;
+        }
+
+        #cross {
+            position: absolute;
+            left: 94%;
+            top: 0;
+            color: red;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: transparent;
+            border: 0;
+        }
+
+        #generatedURL {
+            width: 100%;
+            height: 30px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <header>
+            <h1>API Request Form</h1>
+        </header>
+        <section class="API-form">
+            <button id="btn">API</button>
+            <div id="ovrly"></div>
+            <div id="api-rqts">
+                <button id="cross">&cross;</button>
+                <h1>API Requests</h1>
+                <form id="apiForm">
+                    <h3>Select Stock Name</h3>
+                    <div class="dropdown">
+                        <button class="dropbtn" id="selectStocksButton">Select Stocks</button>
+                        <div id="stockOptions" class="dropdown-content"></div>
+                    </div>
+                
+                    <h3>Select Columns</h3>
+                    <div class="dropdown">
+                        <button class="dropbtn" id="selectColumnsButton">Select Columns</button>
+                        <div id="columnOptions" class="dropdown-content"></div>
+                    </div>
+                    
+                    <h3>Selected:</h3>
+                    <h3 id="slt_stocks">Stocks: </h3>
+                    <h3 id="slt_clms">Columns: </h3>
+                    
+                    <button class="dropbtn" type="button" onclick="generateURL()">Generate URL</button>
+                    <input type="text" id="generatedURL" readonly>
+                    <div class="tooltip">
+                        <button class="dropbtn" type="button" onclick="copyToClipboard()" onmouseout="outFunc()">
+                            <span class="tooltiptext" id="myTooltip">Copy to clipboard</span>
+                            Copy to Clipboard
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+    <script type="module">
+        import { io } from "https://cdn.socket.io/4.7.4/socket.io.esm.min.js";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const stockNames = ['AAA', 'AAM', 'AAT', 'ABR', 'ABS', 'ABT', 'ACB', 'ACC', 'ACG', 'ACL', 'ADG', 'ADP', 'ADS', 'AGG', 'AGM', 'AGR', 'ANV', 'APG', 'APH', 'ASG', 'ASM', 'ASP', 'AST', 'BAF', 'BBC', 'BCE', 'BCG', 'BCM', 'BFC', 'BHN', 'BIC', 'BID', 'BKG', 'BMC', 'BMI', 'BMP', 'BRC', 'BSI', 'BTP', 'BTT', 'BVH', 'BWE', 'C32', 'C47', 'CAV', 'CCI', 'CCL', 
+                                'CDC', 'CHP', 'CIG', 'CII', 'CKG', 'CLC', 'CLL', 'CLW', 'CMG', 'CMV', 'CMX', 'CNG', 'COM', 'CRC', 'CRE', 'CSM', 'CSV', 'CTD', 'CTF', 'CTG', 'CTI', 'CTR', 'CTS', 'CVT', 'D2D', 'DAG', 'DAH', 'DAT', 'DBC', 'DBD', 'DBT', 'DC4', 'DCL', 'DCM', 'DGC', 'DGW', 'DHA', 'DHC', 'DHG', 'DHM', 'DIG', 'DLG', 'DMC', 'DPG', 'DPM', 'DPR', 'DQC', 'DRC', 'DRH', 'DRL', 'DSE', 'DSN', 'DTA', 'DTL', 'DTT', 'DVP', 'DXG', 'DXS', 'DXV', 'E1VFVN30', 'EIB', 'ELC', 'EVE', 'EVF', 'EVG', 'FCM', 'FCN', 'FDC', 'FIR', 'FIT', 
+                                'FMC', 'FPT', 'FRT', 'FTS', 'FUCTVGF3', 'FUCTVGF4', 'FUCTVGF5', 'FUCVREIT', 'FUEBFVND', 'FUEDCMID', 'FUEFCV50', 'FUEIP100', 'FUEKIV30', 'FUEKIVFS', 'FUEKIVND', 'FUEMAV30', 'FUEMAVND', 'FUESSV30', 'FUESSV50', 'FUESSVFL', 'FUEVFVND', 'FUEVN100', 'GAS', 'GDT', 'GEG', 'GEX', 'GIL', 'GMC', 'GMD', 'GMH', 'GSP', 'GTA', 'GVR', 'HAG', 'HAH', 'HAP', 'HAR', 'HAS', 'HAX', 'HBC', 'HCD', 'HCM', 'HDB', 'HDC', 'HDG', 'HHP', 'HHS', 'HHV', 'HID', 'HII', 'HMC', 'HNA', 'HNG', 'HPG', 'HPX', 'HQC', 'HRC', 'HSG', 'HSL', 'HT1', 'HTG', 'HTI', 'HTL', 'HTN', 'HTV', 'HU1', 'HUB', 'HVH', 'HVN', 'HVX', 'ICT', 'IDI', 'IJC', 'ILB', 'IMP', 'ITA', 'ITC', 'ITD', 'JVC', 'KBC', 'KDC', 'KDH', 'KHG', 'KHP', 'KMR', 'KOS', 'KPF', 'KSB', 'L10', 'LAF', 'LBM', 'LCG', 'LDG', 'LEC', 'LGC', 'LGL', 'LHG', 'LIX', 'LM8', 'LPB', 'LSS', 'MBB', 'MCM', 'MCP', 'MDG', 
+                                'MHC', 'MIG', 'MSB', 'MSH', 'MSN', 'MWG', 'NAB', 'NAF', 'NAV', 'NBB', 'NCT', 'NHA', 'NHH', 'NHT', 'NKG', 'NLG', 'NNC', 'NO1', 'NSC', 'NT2', 'NTL', 'NVL', 'NVT', 'OCB', 'OGC', 'OPC', 'ORS', 'PAC', 'PAN', 'PC1', 'PDN', 'PDR', 'PET', 'PGC', 'PGD', 'PGI', 'PGV', 'PHC', 'PHR', 'PIT', 'PJT', 'PLP', 'PLX', 'PMG', 'PNC', 'PNJ', 'POW', 'PPC', 'PSH', 'PTB', 'PTC', 'PTL', 'PVD', 'PVP', 'PVT', 'QCG', 'QNP', 'RAL', 'RDP', 'REE', 'S4A', 'SAB', 'SAM', 'SAV', 'SBA', 'SBG', 'SBT', 'SBV', 'SC5', 'SCR', 'SCS', 'SFC', 'SFG', 'SFI', 'SGN', 'SGR', 'SGT', 'SHA', 'SHB', 'SHI', 'SHP', 'SIP', 'SJD', 'SJF', 'SJS', 'SKG', 'SMA', 'SMB', 'SMC', 'SPM', 'SRC', 'SRF', 'SSB', 'SSC', 'SSI', 'ST8', 'STB', 'STG', 'STK', 'SVC', 'SVD', 'SVI', 'SVT', 'SZC', 'SZL', 'TBC', 'TCB', 'TCD', 'TCH', 'TCI', 'TCL', 'TCM', 'TCO', 'TCR', 'TCT', 'TDC', 'TDG', 'TDH', 'TDM', 'TDP', 'TDW', 'TEG', 'THG', 'TIP', 'TIX', 'TLD', 'TLG', 'TLH', 'TMP', 'TMS', 'TMT', 'TN1', 'TNA', 'TNC', 'TNH', 'TNI', 'TNT', 'TPB', 'TPC', 'TRA', 'TRC', 'TSC', 'TTA', 'TTE', 'TTF', 'TV2', 'TVB', 'TVS', 'TVT', 'TYA', 'UIC', 'VAF', 'VCA', 'VCB', 'VCF', 'VCG', 'VCI', 'VDP', 'VDS', 'VFG', 'VGC', 'VHC', 'VHM', 'VIB', 'VIC', 
+                                'VID', 'VIP', 'VIX', 'VJC', 'VMD', 'VND', 'VNE', 'VNG', 'VNL', 'VNM', 'VNS', 'VOS', 'VPB', 'VPD', 'VPG', 'VPH', 'VPI', 'VPS', 'VRC', 'VRE', 'VSC', 'VSH', 'VSI', 'VTB', 'VTO', 'VTP', 'YBM', 'YEG'];  // Replace with actual stock names
+            const columns = ['ceiling', 'floor', 'prior_close_price', 'change', 'close_price', 'close_volume', 'total_trading', 'open', 'high', 'low', 'foreign_buy', 'foreign_sell', 'foreign_remain'];  // Replace with actual columns
+
+            const stockOptionsContainer = document.getElementById('stockOptions');
+            const columnOptionsContainer = document.getElementById('columnOptions');
+            const selectedStocksElement = document.getElementById('slt_stocks');
+            const selectedColumnsElement = document.getElementById('slt_clms');
+
+            const selectStocksButton = document.getElementById('selectStocksButton');
+            const selectColumnsButton = document.getElementById('selectColumnsButton');
+
+            selectStocksButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                document.getElementById('stockOptions').classList.toggle('show');
+            });
+
+            selectColumnsButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                document.getElementById('columnOptions').classList.toggle('show');
+            });
+
+            window.addEventListener('click', (event) => {
+                if (!event.target.matches('.dropbtn')) {
+                    const dropdowns = document.querySelectorAll('.dropdown-content');
+                    dropdowns.forEach(dropdown => {
+                        if (dropdown.classList.contains('show')) {
+                            dropdown.classList.remove('show');
+                        }
+                    });
+                }
+            });
+
+            function displayStockOptions(stockNames) {
+                stockOptionsContainer.innerHTML = '';
+                
+                const selectAll = document.createElement('input');
+                selectAll.type = 'checkbox';
+                selectAll.id = 'select_all_stocks';
+                selectAll.addEventListener('change', () => {
+                    const checkboxes = stockOptionsContainer.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = selectAll.checked;
+                    });
+                    updateSelectedStocks();
+                });
+
+                const selectAllLabel = document.createElement('label');
+                selectAllLabel.appendChild(selectAll);
+                selectAllLabel.appendChild(document.createTextNode('Select All'));
+                stockOptionsContainer.appendChild(selectAllLabel);
+                
+                stockNames.forEach(stock => {
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.name = 'stock_name';
+                    input.value = stock;
+                    input.addEventListener('change', updateSelectedStocks);
+
+                    const label = document.createElement('label');
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(stock));
+                    stockOptionsContainer.appendChild(label);
+                });
+            }
+
+            function displayColumnOptions(columns) {
+                columnOptionsContainer.innerHTML = '';
+                
+                const selectAll = document.createElement('input');
+                selectAll.type = 'checkbox';
+                selectAll.id = 'select_all_columns';
+                selectAll.addEventListener('change', () => {
+                    const checkboxes = columnOptionsContainer.querySelectorAll('input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = selectAll.checked;
+                    });
+                    updateSelectedColumns();
+                });
+
+                const selectAllLabel = document.createElement('label');
+                selectAllLabel.appendChild(selectAll);
+                selectAllLabel.appendChild(document.createTextNode('Select All'));
+                columnOptionsContainer.appendChild(selectAllLabel);
+
+                columns.forEach(column => {
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.name = 'columns';
+                    input.value = column;
+                    input.addEventListener('change', updateSelectedColumns);
+
+                    const label = document.createElement('label');
+                    label.appendChild(input);
+                    label.appendChild(document.createTextNode(column));
+                    columnOptionsContainer.appendChild(label);
+                });
+            }
+
+            function updateSelectedStocks() {
+                const selectedStocks = Array.from(stockOptionsContainer.querySelectorAll('input[name="stock_name"]:checked'))
+                    .map(checkbox => checkbox.value);
+                selectedStocksElement.textContent = 'Stocks: ' + selectedStocks.join(', ');
+            }
+
+            function updateSelectedColumns() {
+                const selectedColumns = Array.from(columnOptionsContainer.querySelectorAll('input[name="columns"]:checked'))
+                    .map(checkbox => checkbox.value);
+                selectedColumnsElement.textContent = 'Columns: ' + selectedColumns.join(', ');
+            }
+
+            window.copyToClipboard = function copyToClipboard() {
+                const copyText = document.getElementById('generatedURL');
+                copyText.select();
+                copyText.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(copyText.value);
+                
+                const tooltip = document.getElementById("myTooltip");
+                tooltip.innerHTML = "Copied URL";
+            }
+
+            window.outFunc = function outFunc() {
+                const tooltip = document.getElementById("myTooltip");
+                tooltip.innerHTML = "Copy to clipboard";
+            }
+
+            window.generateURL = function generateURL() {
+                const selectedStocks = Array.from(stockOptionsContainer.querySelectorAll('input[name="stock_name"]:checked'))
+                    .map(checkbox => checkbox.value);
+                const selectedColumns = Array.from(columnOptionsContainer.querySelectorAll('input[name="columns"]:checked'))
+                    .map(checkbox => checkbox.value);
+
+                const params = new URLSearchParams();
+                selectedStocks.forEach(stock => params.append('stock_name', stock));
+                selectedColumns.forEach(column => params.append('columns', column));
+
+                const url = window.location.protocol + '//' + window.location.host + `/api/data/custom?${params.toString()}`;
+                document.getElementById('generatedURL').value = url;
+            };
+
+            document.getElementById('btn').addEventListener('click', () => {
+                document.getElementById('ovrly').style.display = 'block';
+                document.getElementById('api-rqts').style.display = 'block';
+                document.getElementById('api-rqts').style.top = '100px';
+                
+                displayStockOptions(stockNames);
+                displayColumnOptions(columns);
+            });
+
+            document.getElementById('ovrly').addEventListener('click', () => {
+                document.getElementById('ovrly').style.display = 'none';
+                document.getElementById('api-rqts').style.display = 'none';
+                document.getElementById('api-rqts').style.top = '-250px';
+            });
+
+            document.getElementById('cross').addEventListener('click', () => {
+                document.getElementById('ovrly').style.display = 'none';
+                document.getElementById('api-rqts').style.display = 'none';
+                document.getElementById('api-rqts').style.top = '-250px';
+            });
+        });
+    </script>
+</body>
+</html>
